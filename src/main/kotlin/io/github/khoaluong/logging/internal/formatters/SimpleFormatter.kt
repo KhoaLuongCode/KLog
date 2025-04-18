@@ -21,16 +21,10 @@ class SimpleFormatter(
 
     override fun format(event: LogEvent): String {
         val sb = StringBuilder()
-        sb.append("[")
-        sb.append(dateFormatter.format(event.timestamp))
-        sb.append("] [")
-        sb.append(event.level.name.padEnd(5)) // Pad for alignment
-        sb.append("] [")
-        sb.append(event.threadName)
-        sb.append("] ")
-        sb.append(event.loggerName)
-        sb.append(" - ")
-        sb.append(event.message)
+        sb.append(
+            "[${dateFormatter.format(event.timestamp)}] " + "[${event.level.name.padEnd(5)}] " + "[${event.threadName}|${event.coroutineContext}] - " + event.message
+        )
+
 
         if (event.contextData.isNotEmpty()) {
             sb.append(" ")
@@ -43,6 +37,8 @@ class SimpleFormatter(
             it.printStackTrace(PrintWriter(sw))
             sb.append(sw.toString())
         }
+
+        sb.append(System.lineSeparator()) // New line at the end
 
         return sb.toString()
     }

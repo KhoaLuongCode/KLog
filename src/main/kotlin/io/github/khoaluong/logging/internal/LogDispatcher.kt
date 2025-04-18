@@ -3,7 +3,6 @@ package io.github.khoaluong.logging.internal
 import io.github.khoaluong.logging.api.*
 import io.github.khoaluong.logging.coroutines.LoggingContextElement
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.job
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
@@ -15,13 +14,13 @@ import java.util.concurrent.atomic.AtomicReference
  * - Dispatching LogEvents to appropriate appenders after filtering.
  * - Ensuring thread safety for configuration and dispatching.
  */
-object LogDispatcher {
+object LogDispatcher : IFilterable<LogEvent> {
     // Use AtomicReference for thread-safe updates of the global level
-    private val globalLevel = AtomicReference(LogLevel.INFO) // Default level
+    private val globalLevel = AtomicReference(LogLevel.TRACE) // Default level
 
     // Use CopyOnWriteArrayList for thread-safe iteration and modification (good for read-heavy appenders/filters)
     private val appenders = CopyOnWriteArrayList<Appender>()
-    private val filters = CopyOnWriteArrayList<Filter>()
+    override val filters = CopyOnWriteArrayList<Filter>()
 
     // Use ConcurrentHashMap for thread-safe logger caching
     private val loggerCache = ConcurrentHashMap<String, Logger>()
@@ -29,7 +28,7 @@ object LogDispatcher {
     // Ensure DefaultLogger is created only once per name
     fun getLogger(name: String): Logger {
         return loggerCache.computeIfAbsent(name) { loggerName ->
-            DefaultLogger(loggerName, this)
+            DefaultLogger(loggerName)
         }
     }
 
@@ -56,16 +55,24 @@ object LogDispatcher {
         appenders.clear()
     }
 
-    fun addFilter(filter: Filter) {
+    override fun addFilter(filter: Filter) {
         filters.add(filter)
     }
 
-    fun removeFilter(filter: Filter) {
+    override fun addFilters(vararg filters: Filter) {
+        filters.forEach { addFilter(it) }
+    }
+
+    override fun removeFilter(filter: Filter) {
         filters.remove(filter)
     }
 
-    fun clearFilters() {
-        filters.clear()
+
+    override fun filterAll(event: LogEvent): Boolean {
+        if (filters.isEmpty()) {
+            return true
+        }
+        return filters.all { it.filter(event) }
     }
 
     // --- Event Dispatching ---
@@ -78,7 +85,7 @@ object LogDispatcher {
      */
     suspend fun dispatch(event: LogEvent) {
         // 1. Check global level first (cheap check)
-        if (!event.level.isEnabled(globalLevel.get())) {
+        if (!event.level.isLogLevelEnabled(globalLevel.get())) {
             return
         }
 
@@ -87,7 +94,7 @@ object LogDispatcher {
 
         // 2. Apply filters
         // Use all {} for efficiency (stops on first false)
-        if (filters.isNotEmpty() && !filters.all { it.filter(enrichedEvent) }) {
+        if (!filterAll(enrichedEvent)) {
             return // Filtered out
         }
 
@@ -140,6 +147,6 @@ object LogDispatcher {
 
     // --- Internal Access for DefaultLogger ---
     fun isEnabled(level: LogLevel): Boolean {
-        return level.isEnabled(globalLevel.get())
+        return level.isLogLevelEnabled(globalLevel.get())
     }
 }

@@ -1,6 +1,8 @@
 package io.github.khoaluong.logging.api
 
+import io.github.khoaluong.logging.internal.DefaultLogger
 import io.github.khoaluong.logging.internal.LogDispatcher
+import io.github.khoaluong.logging.internal.appenders.ConsoleAppender
 
 /**
  * Factory object for obtaining Logger instances.
@@ -31,6 +33,10 @@ object LoggerFactory {
         // Caution: Getting stack trace element is relatively expensive.
         val callerClassName = Thread.currentThread().stackTrace.getOrNull(2)?.className ?: "UnknownSource"
         return getLogger(callerClassName)
+    }
+
+    fun getDefaultLogger(vararg appenders: Appender): DefaultLogger {
+        return DefaultLogger("ABC", *appenders)
     }
 
     /**

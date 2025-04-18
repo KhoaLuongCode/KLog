@@ -17,11 +17,12 @@ interface Appender {
      *
      * @param event The log event to append.
      */
-    fun append(event: LogEvent)
+    suspend fun append(event: LogEvent)
 
     /**
      * Optional: Called when the logging system is shutting down to release resources (e.g., close file handles).
      * Default implementation does nothing.
      */
-    fun stop() {}
+    fun start()
+    fun stop()
 }

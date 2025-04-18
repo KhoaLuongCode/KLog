@@ -4,7 +4,10 @@ import io.github.khoaluong.logging.api.Appender
 import io.github.khoaluong.logging.api.Formatter
 import io.github.khoaluong.logging.api.LogEvent
 import io.github.khoaluong.logging.internal.formatters.SimpleFormatter
+import io.github.khoaluong.logging.io.KLogWriter
+import kotlinx.coroutines.channels.Channel
 import java.io.BufferedWriter
+import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -23,59 +26,71 @@ import kotlin.concurrent.withLock
  * @param formatter The formatter to use. Defaults to SimpleFormatter.
  * @param createDirs If true, attempts to create parent directories if they don't exist.
  */
-class FileAppender(
+class FileAppender private constructor(
     private val filePath: String,
     override val formatter: Formatter = SimpleFormatter(),
-    private val createDirs: Boolean = true
+    private val id: String,
+    private val channel: Channel<String>
 ) : Appender {
 
-    private var writer: BufferedWriter? = null
-    private val lock = ReentrantLock() // Lock for thread-safe file access
 
-    init {
-        try {
-            val path = Paths.get(filePath)
-            if (createDirs) {
-                Files.createDirectories(path.parent)
+    companion object {
+        private val appenders = mutableMapOf<String, FileAppender>()
+
+        fun createFileAppender(
+            filePath: String,
+            formatter: Formatter = SimpleFormatter(),
+        ): FileAppender {
+            for (f in appenders.values) {
+                if (f.filePath == filePath) {
+                    return f
+                }
             }
-            // Open in append mode, create if not exists
-            val fileWriter = FileWriter(filePath, StandardCharsets.UTF_8, true) // Append mode
-            writer = BufferedWriter(fileWriter)
-        } catch (e: IOException) {
-            System.err.println("ERROR: Failed to initialize FileAppender for path '$filePath': ${e.message}")
-            writer = null // Ensure writer is null if initialization failed
+            if (!File(filePath).exists() || !appenders.contains(filePath.hashCode().toString())) {
+                try {
+                    val outputStream = Files.newOutputStream(
+                        Paths.get(filePath),
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.APPEND
+                    )
+                    val id = java.util.UUID.randomUUID().toString()
+                    val channel = KLogWriter.createWriter(
+                        id, 1000, outputStream
+                    )
+                    val appender = FileAppender(filePath, formatter, id, channel)
+                    appenders[filePath.hashCode().toString()] = appender
+                    return appender
+                } catch (e: IOException) {
+                    System.err.println("ERROR: Failed to create file at '$filePath': ${e.message}")
+                    throw e
+                }
+            }
+            return appenders.values.firstOrNull { it.filePath == filePath }
+                ?: throw IllegalStateException("FileAppender for '$filePath' not found.")
         }
     }
 
-    override fun append(event: LogEvent) {
-        val currentWriter = writer ?: return // Don't log if writer init failed
 
+    override suspend fun append(event: LogEvent) {
         try {
             val formattedMessage = formatter.format(event)
-            lock.withLock { // Ensure only one thread writes at a time
-                currentWriter.write(formattedMessage)
-                currentWriter.newLine()
-                currentWriter.flush() // Flush buffer to ensure message is written
-            }
+            channel.send(formattedMessage) // Send formatted message to the channel
         } catch (e: Exception) { // Catch potential formatting or IO errors
             System.err.println("ERROR: FileAppender failed to write to '$filePath': ${e.message}")
             // Consider stopping the appender or trying to reopen the file on certain errors
         }
     }
 
+    override fun start() {
+        KLogWriter.startWriter(id)
+    }
+
     /**
      * Closes the underlying file writer.
      */
     override fun stop() {
-        lock.withLock {
-            try {
-                writer?.close()
-            } catch (e: IOException) {
-                System.err.println("ERROR: Failed to close FileAppender writer for '$filePath': ${e.message}")
-            } finally {
-                writer = null
-            }
-        }
+        KLogWriter.stopWriter(id)
+
     }
 
     override fun toString(): String {

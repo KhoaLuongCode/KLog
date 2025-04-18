@@ -16,7 +16,7 @@ class LevelFilter(private val minLevel: LogLevel) : Filter {
      * Returns `true` if the event's level is at or above the configured minimum level.
      */
     override fun filter(event: LogEvent): Boolean {
-        return event.level.isEnabled(minLevel) // Use LogLevel's comparison logic
+        return event.level.isLogLevelEnabled(minLevel) // Use LogLevel's comparison logic
     }
 
     override fun toString(): String {

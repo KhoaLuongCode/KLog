@@ -1,10 +1,13 @@
 package io.github.khoaluong.logging
 
 import io.github.khoaluong.logging.api.LogLevel
+import io.github.khoaluong.logging.api.Logger
 import io.github.khoaluong.logging.api.LoggerFactory
 import io.github.khoaluong.logging.extensions.getLogger // Use the extension
+import io.github.khoaluong.logging.internal.DefaultLogger
 import io.github.khoaluong.logging.internal.appenders.ConsoleAppender
 import io.github.khoaluong.logging.internal.appenders.FileAppender // Optional
+import io.github.khoaluong.logging.internal.filters.LevelFilter
 import io.github.khoaluong.logging.internal.formatters.SimpleFormatter
 import io.github.khoaluong.logging.internal.formatters.JsonFormatter // Optional
 import kotlinx.coroutines.delay
@@ -20,39 +23,31 @@ fun main(): Unit = runBlocking { // Use runBlocking for simple synchronous-like 
 
     // --- Configuration ---
     // This should ideally happen only once at application startup
-    LoggerFactory.configure {
-        // Set the minimum level for logs to be processed globally
-        level = LogLevel.DEBUG // Log DEBUG and higher levels
 
-        // Add an appender to write to the console
-        addAppender(ConsoleAppender(formatter = SimpleFormatter()))
+    val filter = LevelFilter(LogLevel.TRACE) // Filter to allow only DEBUG and higher levels
 
-        // Optional: Add another appender to write JSON to the console on stderr
-        // addAppender(ConsoleAppender(formatter = JsonFormatter(), target = "stderr"))
 
-        // Optional: Add an appender to write to a file
-        try {
-            addAppender(FileAppender(filePath = "app.log", formatter = SimpleFormatter()))
-            println("INFO: Added FileAppender writing to app.log")
-        } catch (e: Exception) {
-            System.err.println("WARN: Could not initialize FileAppender: ${e.message}")
+    runBlocking {
+        repeat(1){
+            val logger = LoggerFactory.getDefaultLogger(
+                ConsoleAppender.createConsoleAppender(target = ConsoleAppender.ConsoleTarget.STDOUT),
+                FileAppender.createFileAppender("sample.log", formatter = SimpleFormatter())
+            ) as DefaultLogger
+
+            logger.addFilter(filter) // Add filter to the logger
+            // --- Logging Examples ---
+            logger.trace("This trace message will NOT be logged (default level is INFO or DEBUG).") // Will be filtered by level
+            logger.debug("Configuration complete. Starting operations.") // Will be logged if level is DEBUG or TRACE
+            logger.info("This is an informational message.") // Will be logged
+            logger.warn("This is a warning message.")       // Will be logged
+            logger.error("This is an error message.")       // Will be logged
+
+            logger.info { "This uses a lambda for potentially expensive message creation." }
+
+
         }
     }
 
-    // --- Logging Examples ---
-    logger.trace("This trace message will NOT be logged (default level is INFO or DEBUG).") // Will be filtered by level
-    logger.debug("Configuration complete. Starting operations.") // Will be logged if level is DEBUG or TRACE
-    logger.info("This is an informational message.") // Will be logged
-    logger.warn("This is a warning message.")       // Will be logged
-    logger.error("This is an error message.")       // Will be logged
-
-    logger.info { "This uses a lambda for potentially expensive message creation." }
-
-
-
-    // Test logger obtained differently
-    val specificLogger = LoggerFactory.getLogger("SpecificTask")
-    specificLogger.info("Logging from a specific task logger.")
 
 
     println("--- Logging examples finished. Waiting for async logs... ---")
@@ -62,6 +57,6 @@ fun main(): Unit = runBlocking { // Use runBlocking for simple synchronous-like 
 
     // --- Shutdown (Optional but recommended for FileAppender) ---
     // Releases resources like file handles
-    LoggerFactory.shutdown()
+
     println("--- Logging system shut down. ---")
 }

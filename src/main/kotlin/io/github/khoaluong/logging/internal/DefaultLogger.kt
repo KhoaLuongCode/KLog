@@ -1,12 +1,8 @@
 package io.github.khoaluong.logging.internal
 
-import io.github.khoaluong.logging.api.LogEvent
+import io.github.khoaluong.logging.api.*
+import kotlinx.coroutines.*
 // Explicit import needed if LogLevel methods used directly without LogDispatcher check
-import io.github.khoaluong.logging.api.LogLevel
-import io.github.khoaluong.logging.api.Logger
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.Instant
 
 /**
@@ -18,17 +14,24 @@ import java.time.Instant
  * @param name The name of this logger.
  * @param dispatcher The central dispatcher to send log events to.
  */
-internal class DefaultLogger(
-    override val name: String,
-    private val dispatcher: LogDispatcher
-) : Logger {
+class DefaultLogger(
+    override val name: String, vararg val appenders: Appender
+) : Logger, IFilterable<LogEvent> {
+    override val supervisor: Job = SupervisorJob()
+    override val scope: CoroutineScope = CoroutineScope(CoroutineName(name) + Dispatchers.Default + supervisor)
+    override val filters: MutableList<Filter> = mutableListOf()
+
+    init {
+        appenders.forEach {
+            it.start()
+        }
+    }
 
     override fun isEnabled(level: LogLevel): Boolean {
         // Check against the dispatcher's configured global level
-        return dispatcher.isEnabled(level)
+        return LogDispatcher.isEnabled(level)
     }
 
-    @OptIn(DelicateCoroutinesApi::class) // Using GlobalScope for fire-and-forget logging
     override fun log(level: LogLevel, throwable: Throwable?, message: () -> Any?) {
         if (isEnabled(level)) {
             // Evaluate the message lambda only if the level is enabled
@@ -40,22 +43,17 @@ internal class DefaultLogger(
                 loggerName = name,
                 threadName = Thread.currentThread().name, // Captured here
                 message = msgString,
+                coroutineContext = scope.coroutineContext[CoroutineName]?.name ?: "UnknownCoroutine",
                 throwable = throwable
                 // contextData is added by the dispatcher
             )
-
-            // Dispatch asynchronously to avoid blocking the calling thread
-            // Using GlobalScope is simple but has drawbacks (unstructured concurrency).
-            // A dedicated logging scope or allowing user-provided scope would be better.
-            GlobalScope.launch {
-                try {
-                    dispatcher.dispatch(event)
-                } catch (e: Exception) {
-                    // Should not happen if dispatcher handles errors, but good practice
-                    System.err.println("ERROR: Uncaught exception during log dispatch: ${e.message}")
-                    e.printStackTrace(System.err)
+            if (!filterAll(event)) return
+            scope.launch {
+                appenders.forEach { appender ->
+                    appender.append(event)
                 }
             }
+
         }
     }
 
@@ -66,4 +64,28 @@ internal class DefaultLogger(
     override fun info(throwable: Throwable?, message: () -> Any?) = log(LogLevel.INFO, throwable, message)
     override fun warn(throwable: Throwable?, message: () -> Any?) = log(LogLevel.WARN, throwable, message)
     override fun error(throwable: Throwable?, message: () -> Any?) = log(LogLevel.ERROR, throwable, message)
+    override fun shutdown() {
+        appenders.forEach {
+            it.stop()
+        }
+    }
+
+    override fun addFilter(filter: Filter) {
+        filters.add(filter)
+    }
+
+    override fun addFilters(vararg filters: Filter) {
+        filters.forEach { addFilter(it) }
+    }
+
+    override fun removeFilter(filter: Filter) {
+        filters.remove(filter)
+    }
+
+    override fun filterAll(event: LogEvent): Boolean {
+        if (filters.isEmpty()) {
+            return true
+        }
+        return filters.all { it.filter(event) }
+    }
 }

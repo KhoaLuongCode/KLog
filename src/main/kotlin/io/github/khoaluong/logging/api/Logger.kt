@@ -1,5 +1,8 @@
 package io.github.khoaluong.logging.api
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+
 /**
  * The core interface for logging messages.
  * Provides methods for different log levels.
@@ -9,6 +12,8 @@ interface Logger {
      * The name associated with this logger instance.
      */
     val name: String
+    val scope: CoroutineScope
+    val supervisor: Job
 
     /**
      * Checks if a specific log level is currently enabled for this logger.
@@ -51,4 +56,6 @@ interface Logger {
     fun error(message: () -> Any?) = error(null, message)
     fun error(message: String) = error { message }
     fun error(throwable: Throwable?, message: String) = error(throwable) { message }
+
+    fun shutdown()
 }

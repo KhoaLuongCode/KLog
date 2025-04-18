@@ -29,6 +29,7 @@ data class LogEvent(
     val loggerName: String,
     val threadName: String = Thread.currentThread().name,
     val message: String,
+    val coroutineContext: String = "",
     @Transient val throwable: Throwable? = null,
     val contextData: Map<String, String> = emptyMap()
 )

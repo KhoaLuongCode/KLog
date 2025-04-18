@@ -16,7 +16,7 @@ enum class LogLevel {
      * @param minLevel The minimum level required for logging.
      * @return `true` if this level's ordinal is greater than or equal to `minLevel`'s ordinal.
      */
-    fun isEnabled(minLevel: LogLevel): Boolean {
+    fun isLogLevelEnabled(minLevel: LogLevel): Boolean {
         return this.ordinal >= minLevel.ordinal
     }
 }
