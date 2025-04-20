@@ -14,7 +14,7 @@ object KLogWriter {
     }
 
     private fun initWriter(cw: ChannelWriter): Job {
-        println("Starting writer for ${cw.id}")
+        //println("Starting writer for ${cw.id}")
         return CoroutineScope(Dispatchers.IO + supervisor).launch {
             while (true) {
                 val message = cw.channel.receive()
@@ -23,7 +23,6 @@ object KLogWriter {
             }
         }
     }
-
     fun createWriter(id: String, bufferSize: Int, stream: OutputStream): Channel<String> {
         val channel = Channel<String>(bufferSize)
         addChannelWriter(id, channel, stream)

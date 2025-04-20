@@ -5,6 +5,7 @@ interface IFilterable<T> {
 
     fun addFilter(filter: Filter)
     fun addFilters(vararg filters: Filter)
+    fun addFilters(filters: Iterable<Filter>)
     fun removeFilter(filter: Filter)
     fun filterAll(event: T): Boolean
 }
