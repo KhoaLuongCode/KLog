@@ -57,7 +57,7 @@ class ConsoleAppender private constructor(
         KLogWriter.startWriter(id)
     }
 
-    override fun stop() {
+    override suspend fun stop() {
         KLogWriter.stopWriter(id)
     }
 

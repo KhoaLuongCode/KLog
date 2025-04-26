@@ -1,11 +1,10 @@
 package io.github.khoaluong.logging.internal
 
 import io.github.khoaluong.logging.api.*
-import io.github.khoaluong.logging.coroutines.LoggingContextElement
-import io.github.khoaluong.logging.internal.logger.DefaultLogger
-import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
 
 object LogDispatcher {
@@ -13,7 +12,7 @@ object LogDispatcher {
     private val globalLevel = AtomicReference(LogLevel.TRACE) // Default level
     private val loggerCache = ConcurrentHashMap<String, Logger>()
 
-
+    val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     // Ensure DefaultLogger is created only once per name
     fun getLogger(name: String): Logger? {
@@ -38,10 +37,12 @@ object LogDispatcher {
         loggerCache.putIfAbsent(logger.loggerID, logger)
     }
 
-
-    fun shutdown() {
-        loggerCache.clear()
+    suspend fun shutdown()  {
+        loggerCache.values.forEach{
+            it.shutdown()
+        }
     }
+
 
     // --- Internal Access for DefaultLogger ---
     fun isEnabled(level: LogLevel): Boolean {

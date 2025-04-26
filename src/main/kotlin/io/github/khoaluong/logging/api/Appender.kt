@@ -24,5 +24,5 @@ interface Appender {
      * Default implementation does nothing.
      */
     fun start()
-    fun stop()
+    suspend fun stop()
 }

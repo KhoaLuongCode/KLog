@@ -88,7 +88,7 @@ class FileAppender private constructor(
     /**
      * Closes the underlying file writer.
      */
-    override fun stop() {
+    override suspend fun stop() {
         KLogWriter.stopWriter(id)
 
     }

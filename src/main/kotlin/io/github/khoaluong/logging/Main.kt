@@ -1,12 +1,12 @@
 package io.github.khoaluong.logging
 
-import io.github.khoaluong.logging.api.LogLevel
-import io.github.khoaluong.logging.internal.logger.LoggerFactory
-import kotlinx.coroutines.launch
+import io.github.khoaluong.logging.internal.LogDispatcher
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.atomic.AtomicInteger
 
-fun main() {
+fun main():Unit =runBlocking {
     highConcurrency()
+    //val logger = LoggerFactory.getConsoleLogger(name = "Logger")
+    //logger.info { "Hello World" }
+    LogDispatcher.shutdown()
 }
 
