@@ -12,8 +12,8 @@ object LogDispatcher {
     private val loggerCache = ConcurrentHashMap<String, Logger>()
 
 
-    val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
+    val supervisorJob = SupervisorJob()
+    val scope = CoroutineScope(Dispatchers.Default)
     fun getLogger(name: String): Logger? {
         return loggerCache.get(name)
     }

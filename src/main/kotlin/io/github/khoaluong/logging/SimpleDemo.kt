@@ -8,13 +8,13 @@ import io.github.khoaluong.logging.internal.formatters.CsvFormatter
 import io.github.khoaluong.logging.internal.formatters.JsonFormatter
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.job
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 
 fun main(): Unit = runBlocking(CoroutineName("main-runBlocking")) {
     println("--- Starting Logging Sample ---")
-
-
+    println(LogDispatcher.supervisorJob)
     val logger = try {
         LoggerFactory.getLogger(
             name = "SampleApp",
@@ -49,13 +49,13 @@ fun main(): Unit = runBlocking(CoroutineName("main-runBlocking")) {
 
     // Log using a lambda
     logger.info { "This uses a lambda for potentially expensive message creation." }
-
+    println(logger.scope.coroutineContext.job.parent) // Just showcase how to access the parent
 
     println("--- Log messages sent. Check console output, sample.log, sample.csv, and sample.json ---")
     println("--- Waiting for logs to be written... ---")
 
 
-    delay(1000)
+    //delay(1000) there is no need to delay here
 
     println("--- Shutting down LogDispatcher ---")
     LogDispatcher.shutdown()
