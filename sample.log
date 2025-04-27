@@ -102,3 +102,19 @@ java.lang.RuntimeException: Something went wrong!
 	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
 [0m
 [32m[2025-04-27 13:35:44.232] [INFO ] [main||main-runBlocking] - This is an informational message.[0m
+[1;31m[2025-04-27 14:35:14.876] [ERROR] [main||UnknownCoroutine] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SimpleDemoKt$main$1.invokeSuspend(SimpleDemo.kt:48)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at io.github.khoaluong.logging.SimpleDemoKt.main(SimpleDemo.kt:14)
+	at io.github.khoaluong.logging.SimpleDemoKt.main(SimpleDemo.kt)
+[0m
+[32m[2025-04-27 14:35:14.876] [INFO ] [main||UnknownCoroutine] - This uses a lambda for potentially expensive message creation.[0m
+[33m[2025-04-27 14:35:14.876] [WARN ] [main||UnknownCoroutine] - This is a warning message.[0m
+[1;31m[2025-04-27 14:35:14.876] [ERROR] [main||UnknownCoroutine] - This is an error message.[0m
+[32m[2025-04-27 14:35:14.875] [INFO ] [main||UnknownCoroutine] - This is an informational message.[0m

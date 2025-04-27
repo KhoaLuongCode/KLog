@@ -1,8 +1,8 @@
 package io.github.khoaluong.logging.io
 
+import io.github.khoaluong.logging.internal.LogDispatcher
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import java.io.OutputStream
 
 
@@ -16,26 +16,12 @@ object KLogWriter {
     }
 
     private fun initWriter(cw: ChannelWriter): Job {
+        //println("Starting writer for ${cw.id}")
         return scope.launch {
             while (true) {
-                try {
-                    val message = cw.channel.receive()
-                    cw.outputStream.write(message.toByteArray())
-                    cw.outputStream.flush()
-                } catch (e: ClosedReceiveChannelException) {
-                    break
-                } catch (e: CancellationException) {
-                    println("Writer ${cw.id} cancelled.")
-                    throw e
-                } catch (e: Exception) {
-                    System.err.println("Error writing log in writer ${cw.id}: ${e.message}")
-                    break
-                }
-            }
-            try {
-                cw.outputStream.close()
-            } catch (e: Exception) {
-                System.err.println("Error closing stream for writer ${cw.id}: ${e.message}")
+                val message = cw.channel.receive()
+                cw.outputStream.write(message.toByteArray())
+                cw.outputStream.flush()
             }
         }
     }
@@ -47,6 +33,7 @@ object KLogWriter {
     }
 
     fun startWriter(id: String) {
+        //println(id)
         val cw = channelWriterList[id] ?: return
         if (!cw.running) {
             cw.job = initWriter(cw)
@@ -57,9 +44,9 @@ object KLogWriter {
     suspend fun stopWriter(id: String) {
         val cw = channelWriterList[id] ?: return
         if (cw.running) {
+            cw.job?.join()
             cw.running = false
-            cw.job?.cancelAndJoin()
-            channelWriterList.remove(id)
+            cw.outputStream.close()
         }
     }
 

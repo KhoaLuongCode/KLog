@@ -3,10 +3,10 @@ package io.github.khoaluong.logging.internal.logger
 import io.github.khoaluong.logging.api.*
 import io.github.khoaluong.logging.internal.LogDispatcher
 import io.github.khoaluong.logging.internal.filters.LevelFilter
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.*
+// Explicit import needed if LogLevel methods used directly without LogDispatcher check
 import java.time.Instant
-import kotlin.coroutines.coroutineContext
+
 
 open class DefaultLogger(
     override val name: String,
@@ -24,26 +24,20 @@ open class DefaultLogger(
         filters.addAll(filterList)
         appenders.forEach {
             it.start()
-            LogDispatcher.registerAppender(it)
         }
     }
 
-
-    override suspend fun log(level: LogLevel, throwable: Throwable?, message: () -> Any?) {
+    override fun log(level: LogLevel, throwable: Throwable?, message: () -> Any?) {
 
         val msgString = message()?.toString() ?: "null"
-
-        val callerContext = coroutineContext
-        val coroutineName = callerContext[CoroutineName]?.name ?: ""
-
 
         val event = LogEvent(
             timestamp = Instant.now(),
             level = level,
             loggerName = name,
-            threadName = Thread.currentThread().name,
+            threadName = Thread.currentThread().name, // Captured here
             message = msgString,
-            coroutineContext = coroutineName,
+            coroutineContext = scope.coroutineContext[CoroutineName]?.name ?: "UnknownCoroutine",
             throwable = throwable
         )
         if (!filterAll(event)) return
@@ -55,14 +49,15 @@ open class DefaultLogger(
 
     }
 
-    override suspend fun trace(throwable: Throwable?, message: () -> Any?) = log(LogLevel.TRACE, throwable, message)
-    override suspend fun debug(throwable: Throwable?, message: () -> Any?) = log(LogLevel.DEBUG, throwable, message)
-    override suspend fun info(throwable: Throwable?, message: () -> Any?) = log(LogLevel.INFO, throwable, message)
-    override suspend fun warn(throwable: Throwable?, message: () -> Any?) = log(LogLevel.WARN, throwable, message)
-    override suspend fun error(throwable: Throwable?, message: () -> Any?) = log(LogLevel.ERROR, throwable, message)
+    // --- Level Specific Methods ---
+
+    override  fun trace(throwable: Throwable?, message: () -> Any?) = log(LogLevel.TRACE, throwable, message)
+    override  fun debug(throwable: Throwable?, message: () -> Any?) = log(LogLevel.DEBUG, throwable, message)
+    override  fun info(throwable: Throwable?, message: () -> Any?) = log(LogLevel.INFO, throwable, message)
+    override  fun warn(throwable: Throwable?, message: () -> Any?) = log(LogLevel.WARN, throwable, message)
+    override  fun error(throwable: Throwable?, message: () -> Any?) = log(LogLevel.ERROR, throwable, message)
     override suspend fun shutdown() {
-        val jobsToJoin = synchronized(jobs) { jobs.toList() }
-        jobsToJoin.joinAll()
+        jobs.forEach { it.join() }
     }
 
     override fun addFilter(filter: Filter) {
