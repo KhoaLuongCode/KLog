@@ -57,6 +57,7 @@ class SimpleFormatter(
             sb.append(event.contextData)
         }
 
+
         event.throwable?.let {
             sb.append(System.lineSeparator())
             val sw = StringWriter()

@@ -6,6 +6,7 @@ import io.github.khoaluong.logging.internal.filters.LevelFilter
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.*
 import java.time.Instant
+import io.github.khoaluong.logging.internal.coroutines.logContextThreadLocal
 
 open class DefaultLogger(
     override val name: String,
@@ -24,6 +25,7 @@ open class DefaultLogger(
         filters.addAll(filterList)
         appenders.forEach {
             it.start()
+            LogDispatcher.registerAppender(it)
         }
     }
 
@@ -31,14 +33,19 @@ open class DefaultLogger(
 
         val msgString = message()?.toString() ?: "null"
 
+        val currentSnapshot = logContextThreadLocal.get()
+        val capturedCoroutineName = currentSnapshot?.coroutineName ?: ""
+        val capturedContextData = currentSnapshot?.contextData ?: emptyMap()
+
         val event = LogEvent(
             timestamp = Instant.now(),
             level = level,
             loggerName = name,
             threadName = Thread.currentThread().name, // Captured here
             message = msgString,
-            coroutineContext = scope.coroutineContext[CoroutineName]?.name ?: "UnknownCoroutine",
-            throwable = throwable
+            coroutineContext = capturedCoroutineName,
+            throwable = throwable,
+            contextData = capturedContextData
         )
         if (!filterAll(event)) return
         jobs.add(scope.launch {

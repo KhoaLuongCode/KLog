@@ -6,12 +6,10 @@ import io.github.khoaluong.logging.internal.appenders.FileAppender
 import io.github.khoaluong.logging.internal.formatters.SimpleFormatter
 import io.github.khoaluong.logging.internal.formatters.CsvFormatter
 import io.github.khoaluong.logging.internal.formatters.JsonFormatter
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.job
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.io.IOException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun main(): Unit = runBlocking(CoroutineName("main-runBlocking")) {
     println("--- Starting Logging Sample ---")
     println(LogDispatcher.supervisorJob)
@@ -54,8 +52,6 @@ fun main(): Unit = runBlocking(CoroutineName("main-runBlocking")) {
     println("--- Log messages sent. Check console output, sample.log, sample.csv, and sample.json ---")
     println("--- Waiting for logs to be written... ---")
 
-
-    //delay(1000) there is no need to delay here
 
     println("--- Shutting down LogDispatcher ---")
     LogDispatcher.shutdown()

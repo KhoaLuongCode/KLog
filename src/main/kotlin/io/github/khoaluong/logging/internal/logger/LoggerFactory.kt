@@ -11,12 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-
-/**
- * Factory object for obtaining Logger instances.
- * This is the main entry point for users to get loggers.
- * It also provides basic configuration capabilities.
- */
 object LoggerFactory {
 
     fun getLogger(

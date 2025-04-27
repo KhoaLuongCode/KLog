@@ -8,4 +8,14 @@
 	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
 	at io.github.khoaluong.logging.SimpleDemoKt.main(SimpleDemo.kt:14)
 	at io.github.khoaluong.logging.SimpleDemoKt.main(SimpleDemo.kt)
+"2025-04-27T19:48:24.354381Z,ERROR,main,SampleApp,This is an error message.,,2025-04-27T19:48:24.354263Z,WARN,main,SampleApp,This is a warning message.,,2025-04-27T19:48:24.354772Z,INFO,main,SampleApp,This uses a lambda for potentially expensive message creation.,,2025-04-27T19:48:24.353900Z,INFO,main,SampleApp,This is an informational message.,,2025-04-27T19:48:24.354498Z,ERROR,main,SampleApp,An error occurred during processing.,,"java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SimpleDemoKt$main$1.invokeSuspend(SimpleDemo.kt:46)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at io.github.khoaluong.logging.SimpleDemoKt.main(SimpleDemo.kt:13)
+	at io.github.khoaluong.logging.SimpleDemoKt.main(SimpleDemo.kt)
 "

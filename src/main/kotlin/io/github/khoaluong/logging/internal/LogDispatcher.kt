@@ -1,21 +1,20 @@
 package io.github.khoaluong.logging.internal
 
 import io.github.khoaluong.logging.api.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import io.github.khoaluong.logging.io.KLogWriter // Assuming KLogWriter handles actual writing
+import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 
 object LogDispatcher {
-    private val globalLevel = AtomicReference(LogLevel.TRACE) // Default level
+    private val globalLevel = AtomicReference(LogLevel.INFO)
     private val loggerCache = ConcurrentHashMap<String, Logger>()
-
+    private val registeredAppender = ConcurrentHashMap.newKeySet<Appender>()
 
     val supervisorJob = SupervisorJob()
-    val scope = CoroutineScope(Dispatchers.Default)
+
     fun getLogger(name: String): Logger? {
-        return loggerCache.get(name)
+        return loggerCache[name]
     }
 
     var level: LogLevel
@@ -32,13 +31,42 @@ object LogDispatcher {
         loggerCache.putIfAbsent(logger.loggerID, logger)
     }
 
-
-    suspend fun shutdown() {
-        loggerCache.values.forEach {
-            it.shutdown()
-        }
+    fun registerAppender(appender: Appender) {
+        registeredAppender.add(appender)
     }
 
+    suspend fun shutdown() {
+        println("LogDispatcher: Shutting down...")
+        coroutineScope {
+            loggerCache.values.forEach { logger ->
+                launch {
+                    try {
+                        logger.shutdown()
+                    } catch (e: Exception) {
+                        System.err.println("ERROR during logger shutdown (${logger.name}): ${e.message}")
+                        e.printStackTrace(System.err)
+                    }
+                }
+            }
+        }
+        println("LogDispatcher: Loggers finished internal jobs.")
+        loggerCache.clear()
+
+
+        registeredAppender.forEach { appender ->
+            try {
+                appender.stop()
+            } catch (e: Exception) {
+                System.err.println("ERROR stopping appender '${appender::class.simpleName}': ${e.message}")
+                e.printStackTrace(System.err)
+            }
+        }
+        println("LogDispatcher: Appenders stopped.")
+        registeredAppender.clear()
+
+        supervisorJob.cancel()
+        println("LogDispatcher: Supervisor job cancelled.")
+    }
 
     fun isEnabled(level: LogLevel): Boolean {
         return level.isLogLevelEnabled(globalLevel.get())
