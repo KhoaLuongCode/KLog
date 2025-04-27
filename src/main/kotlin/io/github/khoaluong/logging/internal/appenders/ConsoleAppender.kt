@@ -8,12 +8,6 @@ import io.github.khoaluong.logging.io.ChannelWriter
 import io.github.khoaluong.logging.io.KLogWriter
 import kotlinx.coroutines.channels.Channel
 
-/**
- * An appender that writes formatted log events to the standard console output (`System.out` or `System.err`).
- *
- * @param formatter The formatter to use for converting LogEvents to strings. Defaults to SimpleFormatter.
- * @param target Specifies the output stream: "stdout" (default) or "stderr".
- */
 class ConsoleAppender private constructor(
     override val formatter: Formatter,
     private val target: ConsoleTarget,
@@ -52,7 +46,6 @@ class ConsoleAppender private constructor(
         }
     }
 
-    // No resources to stop/release for console appender
     override fun start() {
         KLogWriter.startWriter(id)
     }

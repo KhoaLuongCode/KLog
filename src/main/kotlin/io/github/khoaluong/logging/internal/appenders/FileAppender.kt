@@ -17,15 +17,6 @@ import java.nio.file.StandardOpenOption
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-/**
- * An appender that writes formatted log events to a specified file.
- * Note: This implementation appends to a single file and does not handle rotation.
- * It uses a lock to ensure thread-safe writes.
- *
- * @param filePath The path to the log file.
- * @param formatter The formatter to use. Defaults to SimpleFormatter.
- * @param createDirs If true, attempts to create parent directories if they don't exist.
- */
 class FileAppender private constructor(
     private val filePath: String,
     override val formatter: Formatter = SimpleFormatter(),
@@ -74,10 +65,9 @@ class FileAppender private constructor(
     override suspend fun append(event: LogEvent) {
         try {
             val formattedMessage = formatter.format(event)
-            channel.send(formattedMessage) // Send formatted message to the channel
-        } catch (e: Exception) { // Catch potential formatting or IO errors
+            channel.send(formattedMessage)
+        } catch (e: Exception) {
             System.err.println("ERROR: FileAppender failed to write to '$filePath': ${e.message}")
-            // Consider stopping the appender or trying to reopen the file on certain errors
         }
     }
 
@@ -85,9 +75,6 @@ class FileAppender private constructor(
         KLogWriter.startWriter(id)
     }
 
-    /**
-     * Closes the underlying file writer.
-     */
     override suspend fun stop() {
         KLogWriter.stopWriter(id)
 

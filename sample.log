@@ -1,0 +1,104 @@
+[2025-04-27 12:31:16.271] [INFO ] [main|UnknownCoroutine] - This uses a lambda for potentially expensive message creation.
+[2025-04-27 12:31:16.270] [WARN ] [main|UnknownCoroutine] - This is a warning message.
+[2025-04-27 12:31:16.270] [ERROR] [main|UnknownCoroutine] - This is an error message.
+[2025-04-27 12:31:16.270] [INFO ] [main|UnknownCoroutine] - This is an informational message.
+[2025-04-27 12:31:16.270] [ERROR] [main|UnknownCoroutine] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SampleAppKt$main$1.invokeSuspend(SampleApp.kt:48)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt:13)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
+
+[32m[2025-04-27 12:42:16.554] [INFO ] [main|UnknownCoroutine] - This uses a lambda for potentially expensive message creation.
+[33m[2025-04-27 12:42:16.554] [WARN ] [main|UnknownCoroutine] - This is a warning message.
+[1;31m[2025-04-27 12:42:16.554] [ERROR] [main|UnknownCoroutine] - This is an error message.
+[32m[2025-04-27 12:42:16.554] [INFO ] [main|UnknownCoroutine] - This is an informational message.
+[1;31m[2025-04-27 12:42:16.554] [ERROR] [main|UnknownCoroutine] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SampleAppKt$main$1.invokeSuspend(SampleApp.kt:48)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt:13)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
+
+[33m[2025-04-27 12:42:39.512] [WARN ] [main|UnknownCoroutine] - This is a warning message.
+[32m[2025-04-27 12:42:39.512] [INFO ] [main|UnknownCoroutine] - This is an informational message.
+[32m[2025-04-27 12:42:39.513] [INFO ] [main|UnknownCoroutine] - This uses a lambda for potentially expensive message creation.
+[1;31m[2025-04-27 12:42:39.513] [ERROR] [main|UnknownCoroutine] - This is an error message.
+[1;31m[2025-04-27 12:42:39.513] [ERROR] [main|UnknownCoroutine] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SampleAppKt$main$1.invokeSuspend(SampleApp.kt:48)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt:13)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
+
+[1;31m[2025-04-27 13:17:03.690] [ERROR] [main|] - This is an error message.
+[32m[2025-04-27 13:17:03.689] [INFO ] [main|] - This is an informational message.
+[32m[2025-04-27 13:17:03.690] [INFO ] [main|] - This uses a lambda for potentially expensive message creation.
+[1;31m[2025-04-27 13:17:03.690] [ERROR] [main|] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SampleAppKt$main$1.invokeSuspend(SampleApp.kt:48)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt:13)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
+
+[33m[2025-04-27 13:17:03.690] [WARN ] [main|] - This is a warning message.
+[1;31m[2025-04-27 13:23:27.992] [ERROR] [main||main-runBlocking] - This is an error message.[0m
+[32m[2025-04-27 13:23:27.993] [INFO ] [main||main-runBlocking] - This uses a lambda for potentially expensive message creation.[0m
+[32m[2025-04-27 13:23:27.992] [INFO ] [main||main-runBlocking] - This is an informational message.[0m
+[1;31m[2025-04-27 13:23:27.993] [ERROR] [main||main-runBlocking] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SampleAppKt$main$1.invokeSuspend(SampleApp.kt:49)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt:14)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
+[0m
+[33m[2025-04-27 13:23:27.992] [WARN ] [main||main-runBlocking] - This is a warning message.[0m
+[1;31m[2025-04-27 13:35:44.232] [ERROR] [main||main-runBlocking] - This is an error message.[0m
+[32m[2025-04-27 13:35:44.233] [INFO ] [main||main-runBlocking] - This uses a lambda for potentially expensive message creation.[0m
+[33m[2025-04-27 13:35:44.232] [WARN ] [main||main-runBlocking] - This is a warning message.[0m
+[1;31m[2025-04-27 13:35:44.232] [ERROR] [main||main-runBlocking] - An error occurred during processing.
+java.lang.RuntimeException: Something went wrong!
+	at io.github.khoaluong.logging.SampleAppKt$main$1.invokeSuspend(SampleApp.kt:48)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:104)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:277)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt:14)
+	at io.github.khoaluong.logging.SampleAppKt.main(SampleApp.kt)
+[0m
+[32m[2025-04-27 13:35:44.232] [INFO ] [main||main-runBlocking] - This is an informational message.[0m

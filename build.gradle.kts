@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
     kotlin("jvm") version "1.9.23"
@@ -28,23 +29,31 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.10")
 }
 
-// Configure Java Toolchain - THIS IS THE MAIN FIX
 java {
-    // Set the JDK version for compilation and running tests
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(11)) // Or 17, 21 etc. - choose your desired minimum JVM
     }
-    // Keep these inside the java block
     withSourcesJar()
     withJavadocJar()
 }
 
-// REMOVE or COMMENT OUT this block - The toolchain handles this now
-/*
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11" // No longer needed when using toolchain
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+
+
+            groupId = project.group as String
+            artifactId = rootProject.name
+            version = project.version as String
+
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
-*/
+
 
 tasks.test {
     useJUnitPlatform()
@@ -53,14 +62,6 @@ tasks.test {
     }
 }
 
-// Optional: Basic configuration for publishing (if needed later)
-/*
-publishing {
-   // ... your publishing config ...
-}
-*/
-
-// Configure Dokka for documentation
 tasks.dokkaHtml {
     outputDirectory.set(buildDir.resolve("dokka"))
 }
