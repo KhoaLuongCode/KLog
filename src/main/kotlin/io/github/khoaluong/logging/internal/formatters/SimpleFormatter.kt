@@ -48,7 +48,7 @@ class SimpleFormatter(
         val coroutineContextStr = if (event.coroutineContext.isNotEmpty()) "|${event.coroutineContext}" else ""
 
         sb.append(
-            "[${dateFormatter.format(event.timestamp)}] " + "[${event.level.name.padEnd(5)}] " + "[${event.threadName}|${coroutineContextStr}] - " + event.message
+            "[${dateFormatter.format(event.timestamp)}] " + "[${event.level.name.padEnd(5)}] " + "[${event.threadName}|${event.loggerName}${coroutineContextStr}] - " + event.message
         )
 
 
